@@ -12,8 +12,12 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR,'templates')
 STATIC_DIR=os.path.join(BASE_DIR,'static')
 
@@ -27,7 +31,7 @@ SECRET_KEY = 'hpbv()ep00boce&o0w7z1h)st148(*m@6@-rk$nn)(n9ojj4c0'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -66,6 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'hospital.context_proc.get_some_context',
+                'hospital.context_proc.get_order_number'
             ],
         },
     },
@@ -76,13 +82,26 @@ WSGI_APPLICATION = 'hospitalmanagement.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if DEBUG:
+    DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+else:
+    DATABASES = {
+        'default': {
+            #'ENGINE': 'django.db.backends.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'railway',
+            'USER': 'postgres',
+            'PASSWORD': 'ycGuzfRAXWqAxUZyzRyvXqwwLPNbXiVg',
+            'HOST': 'viaduct.proxy.rlwy.net',
+            'PORT': '53474',
+        }
     }
-}
+
 
 
 # Password validation
@@ -121,11 +140,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
-STATICFILES_DIRS=[STATIC_DIR,]
+# MEDIA_ROOT=os.path.join(BASE_DIR,'static')
 
-MEDIA_ROOT=os.path.join(BASE_DIR,'static')
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 
@@ -145,3 +168,4 @@ EMAIL_HOST_PASSWORD = 'ixkr ncvt zpgp bwmx' # host email password required
 # this process is required because google blocks apps authentication by default
 # EMAIL_RECEIVING_USER = ['nthing841@gmail.com'] # email on which you will receive messages sent from website
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'

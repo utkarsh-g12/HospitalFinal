@@ -1,11 +1,10 @@
 
-
-
-
 from django.contrib import admin
 from django.urls import path
 from hospital import views
 from django.contrib.auth.views import LoginView
+from django.conf.urls.static import static
+from django.conf import settings
 
 
 #-------------FOR ADMIN RELATED URLS
@@ -16,7 +15,7 @@ urlpatterns = [
 
 
     path('aboutus', views.aboutus_view),
-    path('contactus', views.contactus_view),
+    path('contactus', views.contactus_view,name='contactus'),
 
 
     path('adminclick', views.adminclick_view),
@@ -105,3 +104,22 @@ urlpatterns +=[
 urlpatterns +=[
     path('videocall',views.videocall_view,name='videocall'),
 ]
+
+urlpatterns +=[
+    path('medicalshop',views.shop_home,name='medicalshop'),
+    path('product/<int:pk>/', views.shop_product_detail, name='product_detail'),
+    path('store/', views.shop_store, name='store'),
+    path('filter/<str:name>/', views.shop_filtering_view, name='filtering_items'),
+    path('search/', views.shop_search_product, name='search_product'),
+    path('card/', views.shop_card_view, name='card'),
+    path('add_to_card/<int:pk>/', views.shop_add_to_card, name='add_to_card'),
+    path('delete/card/<int:id>/', views.shop_delete_card, name='delete_card'),
+    path('dashboard/', views.shop_dashboard, name='dashboard'),
+    path('product_detail/<int:pk>/',views.shop_product_detail,name='product_detail'),
+    path('signup/', views.shop_signup_view, name='signup'),
+    path('logout/', views.shop_logout_view, name='logout'),
+    path('login/', views.shop_login_view, name='login'),
+]
+
+if settings.DEBUG:
+    urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

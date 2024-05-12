@@ -8,6 +8,15 @@ from datetime import date
 from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth import logout
+from django.shortcuts import get_object_or_404
+from .models import Product, ProductCategory, Order
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from .forms import AddComment
+from django.shortcuts import render, redirect, HttpResponse
+from django.contrib.auth import logout, login, authenticate
+from django.contrib import messages
+from .forms import LoginForm, SignUpForm
 
 
 # Create your views here.
@@ -852,3 +861,168 @@ def contactus_view(request):
 
 def videocall_view(request):
     return render(request,'hospital/VideoCall.html')
+
+
+
+def shop_home(request):
+    products = Product.objects.all()[:8]
+    context = {
+        'products': products
+    }
+    return render(request, 'hospital/shop_index.html', context)
+
+
+def shop_product_detail(request, pk):
+    get_data = get_object_or_404(Product, id=pk)
+    if request.user.is_authenticated:
+        is_ordered = Order.objects.filter(user=request.user, product=get_data)
+        context = {
+            'product': get_data,
+            'is_ordered': is_ordered.count()
+        }
+    else:
+        context = {
+            'product': get_data
+        }
+
+    return render(request, 'hospital/shop_product-detail.html', context)
+
+
+def shop_store(request):
+    get_data = Product.objects.all()
+    cats = ProductCategory.objects.all()
+
+    context = {
+        'cats': cats,
+        'get_data': get_data
+    }
+
+    return render(request, 'hospital/shop_store.html', context)
+
+
+def shop_filtering_view(request, name):
+    cats = ProductCategory.objects.all()
+    get_data = Product.objects.filter(category__name=name)
+
+    context = {
+        'cats': cats,
+        'get_data': get_data
+    }
+
+    return render(request, 'hospital/shop_store.html', context)
+
+
+def shop_search_product(request):
+    searched_for = request.GET.get('q')
+    get_data = Product.objects.filter(
+        Q(name__icontains=searched_for)
+    )
+    print(searched_for)
+    context = {
+        'cats': ProductCategory.objects.all(),
+        'get_data': get_data
+    }
+    return render(request, 'hospital/shop_search-result.html', context)
+
+
+@login_required(login_url='login')
+def shop_card_view(request):
+    get_data = Order.objects.filter(user=request.user)
+    price = 0
+    for i in get_data:
+        price += i.product.price
+
+    context = {
+        'get_data': get_data,
+        'price': price
+    }
+    return render(request, 'hospital/shop_cart.html', context)
+
+
+@login_required(login_url='login')
+def shop_add_to_card(request, pk):
+    product = get_object_or_404(Product, id=pk)
+    new_order = Order.objects.create(
+        user=request.user,
+        product=product,
+    )
+    new_order.save()
+
+    return redirect('product_detail', pk)
+
+
+@login_required(login_url='login')
+def shop_delete_card(request, id):
+    deleting_item = get_object_or_404(Order, id=id)
+    deleting_item.delete()
+    return redirect('card')
+
+
+@login_required(login_url='login')
+def shop_dashboard(request):
+    user_orders = Order.objects.filter(user=request.user, status='P')
+
+    context = {
+        'user_orders': user_orders
+    }
+
+    return render(request, 'hospital/shop_dashboard.html', context)
+
+
+def shop_signup_view(request):
+    if request.method == "POST":
+        form = SignUpForm(request.POST or None)
+        if form.is_valid():
+            get_data = form.cleaned_data
+            form.save()
+            new_user = authenticate(request, username=get_data['username'], password=get_data['password1'])
+            login(request, new_user)
+            return redirect('medicalshop')
+        else:
+            messages.error(request, "The password should not be too similar to the username.")
+            messages.error(request, "Password must be at least 8 characters long.")
+            messages.error(request, "The password should not be too simple.")
+            return redirect('signup')
+    else:
+        form = SignUpForm()
+
+    return render(request, 'hospital/shop_register.html', {'form': form})
+
+
+def shop_logout_view(request):
+    logout(request)
+    return redirect('medicalshop')
+
+
+def shop_login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST or None)
+        if form.is_valid():
+            get_data = form.cleaned_data
+            get_user_number = (get_data['username']).split(' ')
+            user_number = ''
+            for char_user_number in get_user_number:
+                user_number += char_user_number
+            user = authenticate(request, username=user_number, password=get_data['password'])
+            if user is not None:
+                login(request, user)
+                return redirect('medicalshop')
+            else:
+                messages.error(request, 'Your phone number or password is incorrect.')
+                return redirect('login')
+        else:
+            return HttpResponse(form.errors)
+    else:
+        form = LoginForm()
+
+    return render(request, 'hospital/shop_signin.html', {'form': form})
+
+"""
+The two password fields didn’t match
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+This password is too common.
+This password is entirely numeric.
+"""
+
+

@@ -85,3 +85,63 @@ class ContactModel(models.Model):
     name1 = models.CharField(max_length=30)
     email1 = models.CharField(max_length=30)
     message1 = models.CharField(max_length=100)
+
+
+
+class ProductCategory(models.Model):
+    name = models.CharField(max_length=120)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Product Type"
+        verbose_name_plural = "Product Types"
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(unique=True)
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='')
+    price = models.PositiveBigIntegerField()
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Product"
+        verbose_name_plural = "Products"
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = "Comment"
+        verbose_name_plural = "Comments"
+
+class Order(models.Model):
+
+    class StatusChoices(models.TextChoices):
+        Pending = 'P', 'Pending'
+        Ready = 'R', 'Ready'
+        Delivered = 'D', 'Delivered'
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='orders')
+    status = models.CharField(max_length=1, choices=StatusChoices.choices, default=StatusChoices.Pending)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = "Order"
+        verbose_name_plural = "Orders"
