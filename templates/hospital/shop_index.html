@@ -1,0 +1,44 @@
+{% extends 'hospital/shop_base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-intro padding-y-sm">
+<div class="container">
+
+<!--<div class="intro-banner-wrap img-fluid">-->
+<!--    <img src="D:\HospitalFinal\static\images\Banner.png" class="img-fluid rounded" alt="banner image">-->
+<!--</div>-->
+<img src="{% static "images/Banner.png" %}" class="img-fluid" alt="banner">
+
+</div> <!-- container //  -->
+</section>
+<!-- ========================= SECTION MAIN END// ========================= -->
+
+<!-- ========================= SECTION  ========================= -->
+<section class="section-name padding-y-sm">
+<div class="container">
+
+<header class="section-heading">
+    <a href="{% url 'store' %}" class="btn btn-outline-primary float-right">All Product</a>
+    <h3 class="section-title">Most Popular</h3>
+</header><!-- sect-heading -->
+
+
+<div class="row">
+    {% for i in products %}
+    <div class="col-md-3">
+        <div class="card card-product-grid">
+            <a href="{% url 'product_detail' i.id %}" class="img-fluid"> <img style="width: 100%; height: 20rem;" src="{{ i.image.url }}"> </a>
+            <figcaption class="info-wrap">
+                <a href="./shop_product-detail.html" class="title">{{ i.name|slice:28 }} ...</a>
+                <div class="price mt-1"><span class="formatted-price">Rs. {{ i.price }}</span> </div>
+
+            </figcaption>
+        </div>
+    </div> <!-- col.// -->
+    {% endfor %}
+
+</div> <!-- row.// -->
+
+</div><!-- container // -->
+</section>
+{% endblock content %}

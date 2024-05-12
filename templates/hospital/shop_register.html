@@ -1,0 +1,63 @@
+{% extends 'hospital/shop_base.html' %}
+
+{% block content %}
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+
+<!-- ============================ COMPONENT REGISTER   ================================= -->
+	<div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+      <article class="card-body">
+		<header class="mb-4"><h4 class="card-title">Sign Up</h4></header>
+		<form method="post" action="{% url 'signup' %}"> {% csrf_token %}
+				<div class="form-row">
+					<div class="col form-group">
+						<label>First Name</label>
+					  	<input type="text" name="first_name" class="form-control" placeholder="">
+					</div> <!-- form-group end.// -->
+					<div class="col form-group">
+						<label>Last Name</label>
+					  	<input type="text" name="last_name" class="form-control" placeholder="">
+					</div> <!-- form-group end.// -->
+				</div> <!-- form-row end.// -->
+				<div class="form-group">
+					<label>Phone Number</label>
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text">+91</span>
+						</div>
+						<input type="text" name="username" class="form-control" placeholder="Enter your phone number">
+					</div>
+				</div>
+ 					<!-- form-group end.// -->
+				<div class="form-row">
+					<div class="form-group col-md-12">
+						<label>Password</label>
+					    <input type="password" name="password1" class="form-control">
+					</div> <!-- form-group end.// -->
+				</div>
+				<div class="form-row">
+					<div class="form-group col-md-12">
+						<label>Reenter Password</label>
+					    <input type="password" name="password2" class="form-control">
+					</div> <!-- form-group end.// -->
+				</div>
+			    <div class="form-group">
+			        <button type="submit" class="btn btn-primary btn-block"> Register </button>
+			    </div> <!-- form-group// -->
+
+		</form>
+		  {% for message in messages %}
+		  	<p class="lead" style="color: red;">{{ message }}</p>
+		  {% endfor %}
+		</article><!-- card-body.// -->
+    </div> <!-- card .// -->
+    <p class="text-center mt-4">Do you have an account? <a href="{% url 'login' %}">Login</a></p>
+    <br><br>
+<!-- ============================ COMPONENT REGISTER  END.// ================================= -->
+
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock content %}
