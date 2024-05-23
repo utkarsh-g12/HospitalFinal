@@ -45,7 +45,7 @@
 						<var class="price text-muted">Rs. {{ i.product.price }}</var>
 					</td>
 					<td width="250">
-						<a href="" class="btn btn-outline-primary">Pending</a>
+						<var class="order-status text-muted">Your order is {{ i.status }}</var>
 						<a href="{% url 'product_detail' i.product.id %}" class="btn btn-light"> See </a>
 					</td>
 				</tr>

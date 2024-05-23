@@ -1,22 +1,20 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import reverse
 from . import forms, models
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.core.mail import send_mail
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from datetime import date
 from django.conf import settings
-from django.db.models import Q
-from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from .models import Product, ProductCategory, Order
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from .forms import AddComment
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect
 from django.contrib.auth import logout, login, authenticate
 from django.contrib import messages
 from .forms import LoginForm, SignUpForm
+
 
 
 # Create your views here.
@@ -77,6 +75,7 @@ def doctor_signup_view(request):
             doctor = doctor.save()
             my_doctor_group = Group.objects.get_or_create(name='DOCTOR')
             my_doctor_group[0].user_set.add(user)
+            messages.success(request, "Your Account is Created Successfully\n Now Wait For Admin Approval")
         return HttpResponseRedirect('doctorlogin')
     return render(request, 'hospital/doctorsignup.html', context=mydict)
 
@@ -98,6 +97,7 @@ def patient_signup_view(request):
             patient = patient.save()
             my_patient_group = Group.objects.get_or_create(name='PATIENT')
             my_patient_group[0].user_set.add(user)
+            messages.success(request,"Your Account is Created Successfully\n Now Wait For Admin Approval")
         return HttpResponseRedirect('patientlogin')
     return render(request, 'hospital/patientsignup.html', context=mydict)
 
@@ -264,6 +264,11 @@ def approve_doctor_view(request,pk):
     doctor=models.Doctor.objects.get(id=pk)
     doctor.status=True
     doctor.save()
+    firstname = doctor.user.first_name
+    email = doctor.email
+    subject = "Your Profile has been approved by admin"
+    generated_message = 'Dear ' + firstname + '\nWe have accepted your application for E-aushadhalaya and we approved your application now you can access your dashboard using your credentials.'
+    send_mail(subject, generated_message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
     return redirect(reverse('admin-approve-doctor'))
 
 
@@ -389,6 +394,12 @@ def approve_patient_view(request,pk):
     patient=models.Patient.objects.get(id=pk)
     patient.status=True
     patient.save()
+    firstname = patient.user.first_name
+    email = patient.email
+    subject = "Your Profile has been approved by admin"
+    generated_message = 'Dear ' + firstname + ('\nYour Appointment is confirmed in E-aushadhalaya and  now you can '
+                                               'access your dashboard using your credentials. Please follow the instruction of our hospital and get well soon')
+    send_mail(subject, generated_message, settings.EMAIL_HOST_USER, [email], fail_silently=False)
     return redirect(reverse('admin-approve-patient'))
 
 
@@ -847,7 +858,7 @@ def contactus_view(request):
             sv=models.ContactModel(name1=name,email1=email,message1=message)
             sv.save()
             subject = 'Welcome to E-Aushadhalaya '
-            generated_message = 'Dear '+name+'\nwe have received your message and we would like to appreciate your valuable feedback and we are continuously trying to give you our best services.'
+            generated_message = 'Dear '+name+'\nWe have received your message and we would like to appreciate your valuable feedback and we are continuously trying to give you our best services.'
             send_mail(subject,generated_message, settings.EMAIL_HOST_USER, [email], fail_silently = False)
             # send_mail(str(name)+' || '+str(email),message, settings.EMAIL_HOST_USER, [{email}],fail_silently=False)
             return render(request, 'hospital/contactussuccess.html')
@@ -960,7 +971,7 @@ def shop_delete_card(request, id):
 
 @login_required(login_url='login')
 def shop_dashboard(request):
-    user_orders = Order.objects.filter(user=request.user, status='P')
+    user_orders = Order.objects.all()
 
     context = {
         'user_orders': user_orders

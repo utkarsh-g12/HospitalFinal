@@ -30,10 +30,21 @@
   <br>
   <br>
 
+
   <div class="jumbotron" style="margin-top: 0px;
     margin-bottom: 0px;">
+    {% for msg in messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Hey! {{request.user.first_name}}+","</strong> {{msg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
     <h1 class="display-4">Hello {{request.user.first_name}}</h1>
     <p class="lead">Your Account is not approved till now <br><br>Our Team is checking your profile <br><br> Soon your Account will be confirmed !!!</p>
+    <br>
+    <p class="lead">Once Your account is approved we sent to you an email</p>
+    <br>
+    <p class="lead">Thank You for visiting Us</p>
     <hr class="my-4">
     <p>Check Later</p>
     <p class="lead">
