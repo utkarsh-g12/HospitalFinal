@@ -38,7 +38,7 @@ fonttools==4.51.0
 html5lib==1.1
 idna==3.7
 jax==0.4.26
-jaxlib==0.4.26
+jaxlib==0.6.2
 joblib==1.4.0
 kiwisolver==1.4.5
 lxml==5.2.1
@@ -61,6 +61,7 @@ PyMySQL==1.1.0
 pyparsing==3.1.2
 pypdf==4.2.0
 pypng==0.20220715.0
+python==4.4.0
 python-bidi==0.4.2
 python-dateutil==2.9.0.post0
 python-decouple==3.8
